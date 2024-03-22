@@ -1,0 +1,45 @@
+{
+  "name": "@hexlet/code",
+  "version": "1.0.0",
+  "description": "RSS aggregator",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/VladimirMastepanov/frontend-project-11.git"
+  },
+  "author": "Vladimir Mastepanov",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/VladimirMastepanov/frontend-project-11/issues"
+  },
+  "homepage": "https://github.com/VladimirMastepanov/frontend-project-11#readme",
+  "dependencies": {
+    "bootstrap": "^5.3.3",
+    "lodash": "^4.17.21"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.24.3",
+    "@babel/eslint-parser": "^7.24.1",
+    "@babel/preset-env": "^7.18.9",
+    "babel-loader": "^8.2.5",
+    "css-loader": "^6.10.0",
+    "eslint": "^8.57.0",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-plugin-babel": "^5.3.1",
+    "eslint-plugin-import": "^2.29.1",
+    "eslint-plugin-jest": "^27.9.0",
+    "html-webpack-plugin": "^5.6.0",
+    "jest": "^29.7.0",
+    "postcss-loader": "^8.1.1",
+    "sass": "^1.72.0",
+    "sass-loader": "^14.1.1",
+    "style-loader": "^3.3.4",
+    "webpack": "^5.91.0",
+    "webpack-cli": "^5.1.4",
+    "webpack-dev-server": "^4.9.3"
+  }
+}
