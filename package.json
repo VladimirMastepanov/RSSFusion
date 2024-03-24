@@ -2,7 +2,6 @@
   "name": "@hexlet/code",
   "version": "1.0.0",
   "description": "RSS aggregator",
-  "type": "module",
   "main": "index.js",
   "scripts": {
     "start": "webpack serve --mode development",
