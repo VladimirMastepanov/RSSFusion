@@ -20,7 +20,10 @@
   "homepage": "https://github.com/VladimirMastepanov/frontend-project-11#readme",
   "dependencies": {
     "bootstrap": "^5.3.3",
-    "lodash": "^4.17.21"
+    "i18next": "^23.10.1",
+    "lodash": "^4.17.21",
+    "on-change": "^5.0.1",
+    "yup": "^1.4.0"
   },
   "devDependencies": {
     "@babel/core": "^7.24.3",
