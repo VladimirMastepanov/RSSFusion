@@ -2,10 +2,10 @@
 import _ from 'lodash';
 import onChange from 'on-change';
 import i18next from 'i18next';
+import * as yup from 'yup';
 import ru from './locales/ru.js';
-import validate from './validate.js';
-
-const invalidInput = 'is-invalid';
+import view from './view.js';
+import elements from './elements.js';
 
 const initialState = {
   addProcess: {
@@ -34,52 +34,32 @@ const app = () => {
     })
     .then((t) => { t('key'); });
 
-  const form = document.querySelector('.rss-form');
-  const input = document.getElementById('url-input');
-  const div = form.parentElement;
-  const p = div.querySelector('.feedback');
-
-  const state = onChange(initialState, (path, curValue) => {
-    switch (curValue) {
-      case 'filling':
-        console.log('do something on filling');
-        break;
-      case 'filingFailed':
-        input.classList.add(invalidInput);
-        // eslint-disable-next-line max-len
-        !initialState.form.valid ? p.textContent = initialState.form.errors : p.textContent = initialState.feeds.errors;
-        console.log('do something on filingFailed');
-        break;
-      case 'processing':
-
-        console.log('do something on processing');
-        break;
-      case 'processingFailed':
-        console.log('do something on processingFailed');
-        break;
-      case 'processed':
-        console.log('do something on processed');
-        p.textContent = i18n.t('rssUploaded');
-        break;
-      default:
-        break;
-    }
+  yup.setLocale({
+    // mixed: {
+    //   default: i18n.t('defaultError'),
+    // },
+    string: {
+      url: i18n.t('urlInvalid'),
+    },
   });
+  const schema = yup.string().required(i18n.t('urlInvalid')).url(); // Сообщение об ошибке на английском языке
+  const validate = (fields) => schema
+    .validate(fields, { abortEarly: false })
+    .then(() => {})
+    .catch((e) => ({ [e.path]: e.message }));
 
-  input.addEventListener('input', () => {
-    // const { value } = e.target;
-    // state.currentValue = value;
-    // const errors = validate(value);
-    // state.form.errors = errors[''].message;
-    // state.form.valid = _.isEmpty(errors);
-  });
+  const state = onChange(initialState, view(elements, initialState, i18n));
 
-  form.addEventListener('submit', (e) => {
+  elements.form.addEventListener('submit', (e) => {
     e.preventDefault();
-    const { value } = e.target;
+    console.log(e.target[0].value);
+    const { value } = e.target[0];
+    console.log(value);
     state.currentValue = value;
-    const errors = validate(value);
-    state.form.errors = errors[''].message;
+    const errors = validate(value)
+      .then((content) => content);
+    console.log(errors);
+    !_.isEmpty(errors) ? state.form.errors = errors[''].message : state.form.errors = {};
     state.form.valid = _.isEmpty(errors);
     if (state.feeds.feedsCollection.includes(value)) {
       state.feeds.valid = false;
@@ -89,6 +69,7 @@ const app = () => {
       state.addProcess.processState = 'filingFailed';
     } else {
       state.addProcess.processState = 'processing';
+      state.feeds.feedsCollection.concat(value);
     }
   });
 };
