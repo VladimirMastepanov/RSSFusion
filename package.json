@@ -19,6 +19,7 @@
   },
   "homepage": "https://github.com/VladimirMastepanov/frontend-project-11#readme",
   "dependencies": {
+    "axios": "^1.6.8",
     "bootstrap": "^5.3.3",
     "i18next": "^23.10.1",
     "lodash": "^4.17.21",
