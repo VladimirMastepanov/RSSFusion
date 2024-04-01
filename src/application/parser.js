@@ -22,10 +22,12 @@ const parser = (xml, format = 'text/xml') => {
   items.forEach((item) => {
     const title = item.querySelector('title');
     const url = item.querySelector('link');
+    const descriptionPost = item.querySelector('description');
 
     const obj = {
       title: title.textContent,
       url: url.textContent,
+      description: descriptionPost.textContent,
       feedsId,
     };
     posts.push(obj);

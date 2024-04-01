@@ -97,6 +97,14 @@ const app = () => {
                   state.channels.urlCollection.concat(inputValue);
                   state.addProcess.processState = 'processed';
                 })
+                // .then(() => {
+                //   const buttons = document.querySelectorAll('[data-bs-toggle=modal]');
+                //   buttons.forEach((button) => {
+                //     button.addEventListener('shown.bs.modal', (e) =>{
+                //       console.log(e)
+                //     })
+                //   })
+                // })
                 .catch((err) => {
                   console.log(err);
                   state.addProcess.processError = err;
