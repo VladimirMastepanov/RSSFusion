@@ -20,6 +20,7 @@ const parser = (xml, format = 'text/xml') => {
   const posts = [];
   const items = html.querySelectorAll('item');
   items.forEach((item) => {
+    const postId = _.uniqueId();
     const title = item.querySelector('title');
     const url = item.querySelector('link');
     const descriptionPost = item.querySelector('description');
@@ -29,6 +30,7 @@ const parser = (xml, format = 'text/xml') => {
       url: url.textContent,
       description: descriptionPost.textContent,
       feedsId,
+      id: postId,
     };
     posts.push(obj);
   });

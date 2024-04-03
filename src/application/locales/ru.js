@@ -7,5 +7,7 @@ export default {
     feeds: 'Фиды',
     viewButton: 'Просмотр',
     defaultError: 'Произошла неизвестная ошибка',
+    reedAllPost: 'Читать полностью',
+    closeButton: 'Закрыть',
   },
 };
