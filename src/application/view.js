@@ -1,5 +1,6 @@
 import feedsRender from './feeds-render.js';
 import postsRender from './posts-render.js';
+import intervalRender from './interval-render.js';
 
 /* eslint-disable no-param-reassign */
 const invalidInput = 'is-invalid';
@@ -26,6 +27,10 @@ export default (elements, state, i18n) => (path, curValue) => {
       elements.submitButton.disabled = true;
       console.log('do something on processing');
       break;
+    case 'observation':
+      intervalRender(state, i18n);
+      console.log('do something on observation');
+      break;
     case 'processingFailed':
       console.log('do something on processingFailed');
       break;
@@ -36,8 +41,8 @@ export default (elements, state, i18n) => (path, curValue) => {
       elements.pAlert.textContent = i18n.t('rssUploaded');
       elements.feeds.innerHTML = '';
       elements.posts.innerHTML = '';
-      feedsRender(elements.feeds, state.collection.feeds, i18n);
-      postsRender(elements.posts, state.collection.posts, i18n);
+      feedsRender(state.collection.feeds, i18n);
+      postsRender(state.collection.posts, i18n);
       elements.form.reset();
       elements.input.focus();
       console.log('do something on processed');

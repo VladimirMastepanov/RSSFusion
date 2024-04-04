@@ -1,6 +1,8 @@
 // import _ from 'lodash';
+import elements from './elements.js';
 
-export default (container, posts, i18n) => {
+export default (posts, i18n) => {
+  // console.log(posts)
   const cardBorder = document.createElement('div');
   cardBorder.classList.add('card', 'border-0');
   const cardBody = document.createElement('div');
@@ -33,58 +35,10 @@ export default (container, posts, i18n) => {
     button.setAttribute('data-bs-target', '#modal');
     button.textContent = i18n.t('viewButton');
 
-    // const modalDiv = document.createElement('div');
-    // modalDiv.classList.add('modal', 'fade');
-    // modalDiv.setAttribute('tabindex','-1');
-    // modalDiv.setAttribute('aria-labelledby', modalId);
-    // modalDiv.setAttribute('aria-hidden', 'true');
-
-    // const modalDialog = document.createElement('div');
-    // modalDialog.classList.add('modal-dialog');
-
-    // const modalContent = document.createElement('div');
-    // modalContent.classList.add('modal-content');
-
-    // const modalHeader = document.createElement('div');
-    // modalHeader.classList.add('modal-header');
-    // const h5 = document.createElement('h5');
-    // h5.classList.add('modal-title');
-    // h5.setAttribute('id', modalId);
-    // h5.textContent = post.title;
-    // const closeButtonHead = document.createElement('button');
-    // closeButtonHead.classList.add('btn-close');
-    // closeButtonHead.setAttribute('data-bs-dismiss', 'modal');
-    // closeButtonHead.setAttribute('aria-label', 'Close');
-    // modalHeader.append(h5, closeButtonHead);
-
-    // const modalBody = document.createElement('div');
-    // modalBody.classList.add('modal-body');
-    // const pBody = document.createElement('p');
-    // pBody.textContent = post.description;
-    // modalBody.append(pBody);
-
-    // const modalFooter = document.createElement('div');
-    // modalFooter.classList.add('modal-footer');
-    // const linkA = document.createElement('a');
-    // linkA.setAttribute('type', 'button');
-    // linkA.setAttribute('data-bs-dismiss','modal');
-    // linkA.classList.add('btn', 'btn-secondary');
-    // linkA.value = i18n.t('reedAllPost');
-    // linkA.setAttribute('href', post.url);
-    // linkA.setAttribute('target', '_blank');
-    // const closeButtonFooter = document.createElement('button');
-    // closeButtonFooter.classList.add('btn', 'btn-primary');
-    // closeButtonFooter.setAttribute('type', 'button');
-    // closeButtonFooter.value = i18n.t('closeButton');
-    // modalFooter.append(linkA, closeButtonFooter);
-
-    // modalContent.append(modalHeader, modalBody, modalFooter);
-    // modalDialog.append(modalContent);
-    // modalDiv.append(modalDialog);
-
     li.append(a, button);
     ul.append(li);
   });
   cardBorder.append(ul);
-  container.append(cardBorder);
+  elements.posts.innerHTML = '';
+  elements.posts.append(cardBorder);
 };
