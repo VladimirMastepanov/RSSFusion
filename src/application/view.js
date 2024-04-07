@@ -1,11 +1,12 @@
 import feedsRender from './feeds-render.js';
 import postsRender from './posts-render.js';
-import intervalRender from './interval-render.js';
+// import intervalRender from './interval-render.js';
+import modalWindowView from './modal-window-view.js';
 
 /* eslint-disable no-param-reassign */
 const invalidInput = 'is-invalid';
 
-export default (elements, state, i18n) => (path, curValue) => {
+export default (elements, state, uiState, i18n) => (path, curValue) => {
   switch (curValue) {
     case 'filling':
       console.log('do something on filling');
@@ -27,13 +28,6 @@ export default (elements, state, i18n) => (path, curValue) => {
       elements.submitButton.disabled = true;
       console.log('do something on processing');
       break;
-    case 'observation':
-      intervalRender(state, i18n);
-      console.log('do something on observation');
-      break;
-    case 'processingFailed':
-      console.log('do something on processingFailed');
-      break;
     case 'processed':
       elements.input.disabled = false;
       elements.submitButton.disabled = false;
@@ -42,10 +36,26 @@ export default (elements, state, i18n) => (path, curValue) => {
       elements.feeds.innerHTML = '';
       elements.posts.innerHTML = '';
       feedsRender(state.collection.feeds, i18n);
-      postsRender(state.collection.posts, i18n);
+      postsRender(state.collection.posts, uiState.touchedPosts, i18n);
       elements.form.reset();
       elements.input.focus();
       console.log('do something on processed');
+      break;
+    case 'postAdded':
+      // console.log(i18n.t('viewButton'))
+      // intervalRender(state, i18n);
+      postsRender(state.collection.posts, uiState.touchedPosts, i18n);
+      console.log('do something on postAdded');
+      break;
+    case 'observation':
+      console.log('do something on observation');
+      break;
+    case 'touchedPost':
+      modalWindowView(uiState, state.collection.posts);
+      console.log('do something on touchedPost');
+      break;
+    case 'processingFailed':
+      console.log('do something on processingFailed');
       break;
     default:
       break;

@@ -8,13 +8,10 @@ import resources from './locales/index.js';
 import view from './view.js';
 import elements from './elements.js';
 import parser from './parser.js';
-import modalWindowView from './modal-window-view.js';
-
-// const testUrl = 'http://lorem-rss.herokuapp.com/feed';
 
 const initialState = {
-  addProcess: {
-    processState: 'filling', // 'filingFailed' 'processing' 'processed' 'observation' 'processingFailed'
+  process: {
+    processState: 'filling', // 'observation' 'filingFailed' 'processing' 'processed' 'postAdded' 'processingFailed' 'touchedPost'
     processError: {},
   },
   form: {
@@ -32,6 +29,11 @@ const initialState = {
     posts: [],
     postsTitles: [],
   },
+};
+
+const uiState = {
+  touchedPosts: [],
+  currentModalWindow: '',
 };
 
 const app = () => {
@@ -66,7 +68,31 @@ const app = () => {
         });
       // .catch((e) => ({ [e.path]: e.message }));
 
-      const state = onChange(initialState, view(elements, initialState, i18n));
+      const state = onChange(initialState, view(elements, initialState, uiState, i18n));
+
+      const intervalRender = () => {
+        setTimeout(() => {
+          const links = initialState.channels.urlCollection;
+          const promisesGet = links.map((link) => axios.get(`https://allorigins.hexlet.app/get?disableCache=true&url=${encodeURIComponent(link)}`));
+          Promise.all(promisesGet)
+            .then((content) => {
+              const promiseParser = content.map((element) => parser(element.data.contents));
+              Promise.all(promiseParser)
+                .then((feedsAndPosts) => {
+                  const posts = _.flatten(feedsAndPosts.map((feedAndPost) => feedAndPost[1]));
+                  const titles = initialState.collection.posts.map((post) => post.url);
+                  const newTitles = posts.map((post) => post.url);
+                  const difference = _.difference(titles, newTitles);
+                  if (difference.length > 0) {
+                    state.channels.posts = posts;
+                    state.process.processState = 'postAdded';
+                    state.process.processState = 'observation';
+                  }
+                  intervalRender();
+                });
+            });
+        }, 5000);
+      };
 
       elements.form.addEventListener('submit', (e) => {
         e.preventDefault();
@@ -84,9 +110,9 @@ const app = () => {
               state.channels.errors = 'repeatedValueError';
             }
             if (!state.form.valid || !state.channels.valid) {
-              state.addProcess.processState = 'filingFailed';
+              state.process.processState = 'filingFailed';
             } else {
-              state.addProcess.processState = 'processing';
+              state.process.processState = 'processing';
               axios.get(`https://allorigins.hexlet.app/get?disableCache=true&url=${encodeURIComponent(inputValue)}`)
                 .then((str) => parser(str.data.contents))
                 .then(([feed, posts]) => {
@@ -96,21 +122,27 @@ const app = () => {
                 .then(() => {
                   state.channels.urlCollection.push(inputValue);
                   state.form.currentValue = '';
-                  state.addProcess.processState = 'processed';
-                  state.addProcess.processState = 'observation';
+                  state.process.processState = 'processed';
+                  intervalRender();
                   const buttons = document.querySelectorAll('[data-bs-toggle=modal]');
                   buttons.forEach((button) => {
                     button.addEventListener('click', (event) => {
                       const targetId = event.target.attributes[1].value;
-                      // console.log(event.target.attributes, targetId);
-                      modalWindowView(targetId, initialState.collection.posts);
+                      const hrefA = document.querySelector(`[data-id="${targetId}"]`);
+                      const openedPostLink = hrefA.href;
+                      uiState.touchedPosts.push(openedPostLink);
+                      uiState.currentModalWindow = openedPostLink;
+                      state.process.processState = 'touchedPost';
+                      state.process.processState = 'observation';
+                      // console.log(uiState)
+                      // modalWindowView(targetId, initialState.collection.posts, uiState);
                     });
                   });
                 })
                 .catch((err) => {
                   // console.log(err);
-                  state.addProcess.processError = err;
-                  state.addProcess.processState = 'processingFailed';
+                  state.process.processError = err;
+                  state.process.processState = 'processingFailed';
                 });
               // state.feeds.urlCollection.concat(value);
             }
