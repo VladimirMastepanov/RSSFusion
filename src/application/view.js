@@ -1,6 +1,5 @@
 import feedsRender from './feeds-render.js';
 import postsRender from './posts-render.js';
-// import intervalRender from './interval-render.js';
 import modalWindowView from './modal-window-view.js';
 
 /* eslint-disable no-param-reassign */
@@ -42,19 +41,21 @@ export default (elements, state, uiState, i18n) => (path, curValue) => {
       console.log('do something on processed');
       break;
     case 'postAdded':
-      // console.log(i18n.t('viewButton'))
-      // intervalRender(state, i18n);
       postsRender(state.collection.posts, uiState.touchedPosts, i18n);
       console.log('do something on postAdded');
-      break;
-    case 'observation':
-      console.log('do something on observation');
       break;
     case 'touchedPost':
       modalWindowView(uiState, state.collection.posts);
       console.log('do something on touchedPost');
       break;
     case 'processingFailed':
+      elements.input.classList.add(invalidInput);
+      elements.pAlert.classList.replace('text-success', 'text-danger');
+      elements.pAlert.textContent = i18n.t(state.process.processError);
+      elements.input.disabled = false;
+      elements.submitButton.disabled = false;
+      elements.form.reset();
+      elements.input.focus();
       console.log('do something on processingFailed');
       break;
     default:

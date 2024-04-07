@@ -12,7 +12,7 @@ import parser from './parser.js';
 const initialState = {
   process: {
     processState: 'filling', // 'observation' 'filingFailed' 'processing' 'processed' 'postAdded' 'processingFailed' 'touchedPost'
-    processError: {},
+    processError: '',
   },
   form: {
     currentValue: '',
@@ -86,7 +86,7 @@ const app = () => {
                   if (difference.length > 0) {
                     state.channels.posts = posts;
                     state.process.processState = 'postAdded';
-                    state.process.processState = 'observation';
+                    state.process.processState = 'filling';
                   }
                   intervalRender();
                 });
@@ -114,6 +114,16 @@ const app = () => {
             } else {
               state.process.processState = 'processing';
               axios.get(`https://allorigins.hexlet.app/get?disableCache=true&url=${encodeURIComponent(inputValue)}`)
+                .catch((er) => {
+                  // console.log(error.message)
+                  if (er.message === 'Network Error') {
+                    state.process.processError = 'connectionError';
+                    state.process.processState = 'processingFailed';
+                  } else {
+                    state.process.processError = 'rssInvalid';
+                    state.process.processState = 'processingFailed';
+                  }
+                })
                 .then((str) => parser(str.data.contents))
                 .then(([feed, posts]) => {
                   state.collection.feeds.push(feed); // = [...state.collection.feeds, ...feed];
@@ -133,15 +143,13 @@ const app = () => {
                       uiState.touchedPosts.push(openedPostLink);
                       uiState.currentModalWindow = openedPostLink;
                       state.process.processState = 'touchedPost';
-                      state.process.processState = 'observation';
-                      // console.log(uiState)
-                      // modalWindowView(targetId, initialState.collection.posts, uiState);
+                      state.process.processState = 'filling';
                     });
                   });
                 })
                 .catch((err) => {
-                  // console.log(err);
-                  state.process.processError = err;
+                  console.log(err);
+                  state.process.processError = 'rssInvalid';
                   state.process.processState = 'processingFailed';
                 });
               // state.feeds.urlCollection.concat(value);
