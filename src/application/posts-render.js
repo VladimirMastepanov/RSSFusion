@@ -15,8 +15,6 @@ export default (posts, uiState, i18n) => {
   const ul = document.createElement('ul');
   ul.classList.add('list-group', 'border-0', 'rounded-0');
   posts.forEach((post) => {
-    // const id = _.uniqueId();
-    // const modalId = _.uniqueId('modal-');
     const li = document.createElement('li');
     li.classList.add('list-group-item', 'd-flex', 'justify-content-between', 'align-items-start', 'border-0', 'border-end-0');
 

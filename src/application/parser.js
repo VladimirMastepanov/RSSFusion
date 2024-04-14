@@ -34,9 +34,6 @@ const parser = (xml, format = 'text/xml') => {
     };
     posts.push(obj);
   });
-  // console.log(posts)
-  // console.log(channel, description.textContent);
-  // console.log(items);
   return [feed, posts];
 };
 
