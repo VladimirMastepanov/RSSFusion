@@ -1,6 +1,4 @@
-import elements from './elements.js';
-
-export default (feeds, i18n) => {
+export default (feedsElement, feeds, i18n) => {
   const cardBorder = document.createElement('div');
   cardBorder.classList.add('card', 'border-0');
   const cardBody = document.createElement('div');
@@ -29,7 +27,5 @@ export default (feeds, i18n) => {
     ul.append(li);
   });
   cardBorder.append(ul);
-  elements.feeds.innerHTML = '';
-  elements.feeds.append(cardBorder);
-  // container.append(ul);
+  feedsElement.replaceChildren(cardBorder);
 };

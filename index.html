@@ -74,6 +74,7 @@
                 </div>
                 <div class="col-auto">
                   <button
+                  id="form-submit-button"
                     type="submit"
                     aria-label="add"
                     class="h-100 btn btn-lg btn-primary px-sm-5"
@@ -83,16 +84,16 @@
                 </div>
               </div>
             </form>
-            <p data-bs-theme="dark" class="mt-2 mb-0 text-muted">
+            <p  data-bs-theme="dark" class="mt-2 mb-0 text-muted">
               Пример: https://lorem-rss.hexlet.app/feed
             </p>
-            <p class="feedback m-0 position-absolute small text-danger"></p>
+            <p id="message-alert" class="feedback m-0 position-absolute small text-danger"></p>
           </div>
         </div>
       </section>
       <section class="container-fluid container-xxl p-5">
         <div class="row">
-          <div class="col-md-10 col-lg-8 order-1 mx-auto posts"></div>
+          <div class="col-md-10 col-lg-8 order-1 mx-auto posts" id="posts-container"></div>
           <div
             class="col-md-10 col-lg-4 mx-auto order-0 order-lg-1 feeds"
           ></div>

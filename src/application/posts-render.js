@@ -1,8 +1,4 @@
-// import _ from 'lodash';
-import elements from './elements.js';
-
-export default (posts, uiState, i18n) => {
-  // console.log(posts)
+export default (postsElements, posts, uiState, i18n) => {
   const cardBorder = document.createElement('div');
   cardBorder.classList.add('card', 'border-0');
   const cardBody = document.createElement('div');
@@ -17,7 +13,6 @@ export default (posts, uiState, i18n) => {
   posts.forEach((post) => {
     const li = document.createElement('li');
     li.classList.add('list-group-item', 'd-flex', 'justify-content-between', 'align-items-start', 'border-0', 'border-end-0');
-
     const a = document.createElement('a');
     if (uiState.includes(post.url)) {
       a.classList.add('fw-normal');
@@ -27,7 +22,6 @@ export default (posts, uiState, i18n) => {
     a.setAttribute('href', post.url);
     a.setAttribute('target', '_blank');
     a.setAttribute('data-id', post.id);
-
     a.textContent = post.title;
 
     const button = document.createElement('button');
@@ -41,6 +35,5 @@ export default (posts, uiState, i18n) => {
     ul.append(li);
   });
   cardBorder.append(ul);
-  elements.posts.innerHTML = '';
-  elements.posts.append(cardBorder);
+  postsElements.replaceChildren(cardBorder);
 };

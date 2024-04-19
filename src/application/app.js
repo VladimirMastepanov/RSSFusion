@@ -6,34 +6,39 @@ import * as yup from 'yup';
 import axios from 'axios';
 import resources from './locales/index.js';
 import view from './view.js';
-import elements from './elements.js';
 import parser from './parser.js';
+import objectFormation from './object-formation.js';
 
 const initialState = {
   process: {
-    processState: 'filling', // 'observation' 'filingFailed' 'processing' 'processed' 'postAdded' 'processingFailed' 'touchedPost'
-    processError: '',
+    addFeedProcess: 'filling', // 'filingFailed' 'processing' 'processed'  'processingFailed'
+    addPostProcess: 'waiting', // 'postAdded'
+    viewingPostProcess: 'waiting', // 'touchedPost'
+    addFeedError: '',
   },
   form: {
-    currentValue: '',
     valid: true,
     errors: '',
   },
-  channels: {
-    urlCollection: [],
-    valid: true,
-    errors: [],
-  },
   collection: {
+    urlCollection: [],
+    uniqueUrlMessage: '',
     feeds: [],
     posts: [],
     postsTitles: [],
   },
+  uiState: {
+    touchedPosts: [],
+    currentModalWindow: '',
+  },
 };
 
-const uiState = {
-  touchedPosts: [],
-  currentModalWindow: '',
+const urlBase = () => 'https://allorigins.hexlet.app/get?disableCache=true';
+
+const getUrl = (rssUrl) => {
+  const newUrl = new URL(urlBase());
+  newUrl.searchParams.set('url', rssUrl);
+  return newUrl;
 };
 
 const app = () => {
@@ -55,108 +60,112 @@ const app = () => {
           url: () => i18n.t('urlInvalid'),
         },
       });
-
-      const schema = yup.string().url().required();
-      const validate = (fields) => schema
-        .validate(fields, { abortEarly: false })
-        .then(() => { })
-        .catch((e) => {
-          const message = {
-            message: e.message,
-          };
-          return message;
-        });
-      // .catch((e) => ({ [e.path]: e.message }));
-
-      const state = onChange(initialState, view(elements, initialState, uiState, i18n));
-
-      const intervalRender = () => {
-        setTimeout(() => {
-          const links = initialState.channels.urlCollection;
-          const promisesGet = links.map((link) => axios.get(`https://allorigins.hexlet.app/get?disableCache=true&url=${encodeURIComponent(link)}`));
-          Promise.all(promisesGet)
-            .then((content) => {
-              const promiseParser = content.map((element) => parser(element.data.contents));
-              Promise.all(promiseParser)
-                .then((feedsAndPosts) => {
-                  const posts = _.flatten(feedsAndPosts.map((feedAndPost) => feedAndPost[1]));
-                  const titles = initialState.collection.posts.map((post) => post.url);
-                  const newTitles = posts.map((post) => post.url);
-                  const difference = _.difference(titles, newTitles);
-                  if (difference.length > 0) {
-                    state.channels.posts = posts;
-                    state.process.processState = 'postAdded';
-                    state.process.processState = 'filling';
-                  }
-                  intervalRender();
-                });
-            });
-        }, 5000);
-      };
-
-      elements.form.addEventListener('submit', (e) => {
-        e.preventDefault();
-        // console.log(e.target[0].value);
-        const { value } = e.target[0];
-        const inputValue = value.trim();
-        state.form.currentValue = inputValue;
-        validate(inputValue)
-          .then((error) => {
-            !_.isEmpty(error) ? state.form.errors = 'urlInvalid' : state.form.errors = {};
-            // console.log(error);
-            state.form.valid = _.isEmpty(error);
-            if (state.channels.urlCollection.includes(state.form.currentValue)) {
-              state.channels.valid = false;
-              state.channels.errors = 'repeatedValueError';
-            }
-            if (!state.form.valid || !state.channels.valid) {
-              state.process.processState = 'filingFailed';
-            } else {
-              state.process.processState = 'processing';
-              axios.get(`https://allorigins.hexlet.app/get?disableCache=true&url=${encodeURIComponent(inputValue)}`)
-                .catch((er) => {
-                  // console.log(error.message)
-                  if (er.message === 'Network Error') {
-                    state.process.processError = 'connectionError';
-                    state.process.processState = 'processingFailed';
-                  } else {
-                    state.process.processError = 'rssInvalid';
-                    state.process.processState = 'processingFailed';
-                  }
-                })
-                .then((str) => parser(str.data.contents))
-                .then(([feed, posts]) => {
-                  state.collection.feeds.push(feed); // = [...state.collection.feeds, ...feed];
-                  state.collection.posts = [...state.collection.posts, ...posts];
-                })
-                .then(() => {
-                  state.channels.urlCollection.push(inputValue);
-                  state.form.currentValue = '';
-                  state.process.processState = 'processed';
-                  intervalRender();
-                  const buttons = document.querySelectorAll('[data-bs-toggle=modal]');
-                  buttons.forEach((button) => {
-                    button.addEventListener('click', (event) => {
-                      const targetId = event.target.attributes[1].value;
-                      const hrefA = document.querySelector(`[data-id="${targetId}"]`);
-                      const openedPostLink = hrefA.href;
-                      uiState.touchedPosts.push(openedPostLink);
-                      uiState.currentModalWindow = openedPostLink;
-                      state.process.processState = 'touchedPost';
-                      state.process.processState = 'filling';
-                    });
-                  });
-                })
-                .catch((err) => {
-                  console.log(err);
-                  state.process.processError = 'rssInvalid';
-                  state.process.processState = 'processingFailed';
-                });
-              // state.feeds.urlCollection.concat(value);
-            }
-          });
-      });
     });
+
+  const schema = yup.string().url().required();
+  const validate = (fields) => schema
+    .validate(fields, { abortEarly: false })
+    .then(() => { })
+    .catch((e) => {
+      const message = {
+        message: e.message,
+      };
+      return message;
+    });
+
+  const elements = {
+    form: document.querySelector('.rss-form'),
+    input: document.getElementById('url-input'),
+    submitButton: document.getElementById('form-submit-button'),
+    pAlert: document.getElementById('message-alert'),
+    posts: document.querySelector('.posts'),
+    feeds: document.querySelector('.feeds'),
+  };
+
+  const state = onChange(initialState, view(elements, initialState, i18n));
+
+  const intervalRender = () => {
+    setTimeout(() => {
+      const links = initialState.collection.urlCollection;
+      const promisesGet = links.map((link) => axios.get(getUrl(link)));
+      Promise.all(promisesGet)
+        .then((content) => {
+          const htmlCollections = content.map((element) => parser(element.data.contents));
+          const feedsAndPosts = htmlCollections.map((html) => objectFormation(html));
+          const posts = _.flatten(feedsAndPosts.map((feedAndPost) => feedAndPost[1]));
+          const titles = initialState.collection.posts.map((post) => post.url);
+          const newTitles = posts.map((post) => post.url);
+          const difference = _.difference(titles, newTitles);
+          if (difference.length > 0) {
+            state.collection.posts = posts;
+            state.process.addPostProcess = 'postAdded';
+            state.process.addPostProcess = 'waiting';
+          }
+        });
+      intervalRender();
+    }, 5000);
+  };
+
+  intervalRender();
+
+  elements.form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const formData = new FormData(elements.form);
+    const formValue = formData.get('url');
+    const inputValue = formValue.trim();
+    validate(inputValue)
+      .then((ValidationMessage) => {
+        !_.isEmpty(ValidationMessage) ? state.form.errors = 'urlInvalid' : state.form.errors = {};
+        state.form.valid = _.isEmpty(ValidationMessage);
+        if (state.collection.urlCollection.includes(inputValue)) {
+          state.process.addFeedError = 'repeatedValueError';
+          state.process.addFeedProcess = 'filingFailed';
+          state.process.addFeedProcess = 'filling';
+        } else if (!state.form.valid || (state.collection.uniqueUrlMessage !== '')) {
+          state.process.addFeedProcess = 'filingFailed';
+          state.process.addFeedProcess = 'filling';
+        } else {
+          state.process.addFeedProcess = 'processing';
+          axios.get(getUrl(inputValue))
+            .then((str) => {
+              const html = parser(str.data.contents);
+              if (html === null) {
+                state.process.addFeedError = 'rssInvalid';
+                state.process.addFeedProcess = 'processingFailed';
+                state.process.addFeedProcess = 'filling';
+              } else {
+                const [feed, posts] = objectFormation(html);
+                state.collection.feeds.push(feed); // = [...state.collection.feeds, ...feed];
+                state.collection.posts = [...state.collection.posts, ...posts];
+                state.collection.urlCollection.push(inputValue);
+                state.process.addFeedProcess = 'processed';
+                state.process.addFeedProcess = 'filling';
+              }
+            })
+            .catch((err) => {
+              if (err.message === 'Network Error') {
+                state.process.addFeedError = 'connectionError';
+                state.process.addFeedProcess = 'processingFailed';
+                state.process.addFeedProcess = 'filling';
+              }
+            });
+        }
+      });
+  });
+
+  const postsContainer = document.getElementById('posts-container');
+  postsContainer.addEventListener('click', (ev) => {
+    const button = ev.target;
+    if (button.tagName === 'BUTTON') {
+      const targetId = button.attributes[1].value;
+      const hrefA = document.querySelector(`[data-id="${targetId}"]`);
+      const openedPostLink = hrefA.href;
+      state.uiState.touchedPosts.push(openedPostLink);
+      state.uiState.currentModalWindow = openedPostLink;
+      state.process.viewingPostProcess = 'touchedPost';
+      state.process.viewingPostProcess = 'waiting';
+    }
+  });
 };
 
 export default app;
