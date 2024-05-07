@@ -2,18 +2,16 @@ const xmlParser = new DOMParser();
 
 const parser = (xml, format = 'text/xml') => {
   const html = xmlParser.parseFromString(xml, format);
-  console.log(html)
-  console.log(html.querySelector('parsererror'))
   if (html.querySelector('parsererror')) {
     return null;
   }
   const channelFeed = html.querySelector('title');
   const descriptionFeed = html.querySelector('description');
-  const urlFeed = html.querySelector('link');
+  const linkFeed = html.querySelector('link');
   const feed = {
     channel: channelFeed.textContent,
     description: descriptionFeed.textContent,
-    url: urlFeed.textContent,
+    link: linkFeed.textContent,
   };
   const posts = [];
   const items = html.querySelectorAll('item');

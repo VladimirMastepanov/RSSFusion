@@ -47,24 +47,8 @@ const app = () => {
         },
         string: {
           url: () => i18n.t('urlInvalid'),
-          // notOneOf: () => i18n.t('urlTaken')
         },
       });
-
-      const baseSchema = yup.string().url().required();
-      const validate = (fields) => {
-        const urls = initialState.feeds.map((i) => i.url);
-        const actualSchema = baseSchema.notOneOf(urls, i18n.t('urlTaken'));
-        return actualSchema
-          .validate(fields, { abortEarly: false })
-          .then(() => { })
-          .catch((e) => {
-            const message = {
-              message: e.message,
-            };
-            return message;
-          });
-      };
 
       const elements = {
         form: document.querySelector('.rss-form'),
@@ -77,34 +61,45 @@ const app = () => {
 
       const state = onChange(initialState, view(elements, initialState, i18n));
 
+      const baseSchema = yup.string().url().required();
+
+      const validate = (fields) => {
+        const actualSchema = baseSchema.notOneOf(state.feeds.map((i) => i.url), i18n.t('urlTaken'));
+        return actualSchema
+          .validate(fields, { abortEarly: false })
+          .then(() => { })
+          .catch((e) => {
+            const message = {
+              message: e.message,
+            };
+            return message;
+          });
+      };
+
       const intervalRender = () => {
         setTimeout(() => {
-          const links = initialState.feeds.map((feedItem) => feedItem.url);
-          // console.log(links)
-          const promisesGet = links.map((link) => axios.get(getUrl(link)));
+          const promisesGet = state.feeds
+            .map((feedItem) => feedItem.url)
+            .map((link) => axios.get(getUrl(link)));
           Promise.all(promisesGet)
-            .then((content) => {
-              // console.log(content)
-              const parsedData = content.map((element) => parser(element.data.contents));
-              // console.log(parsedData)
-              if (parsedData !== null) {
-                parsedData.forEach(([feed, posts]) => {
-                  const [feedWithId] = initialState.feeds.filter((item) => item.url === feed.url);
-                  const urlPosts = initialState.posts
-                    .filter((post) => post.feedsId === feedWithId.id)
-                    .map((el) => el.url);
-                  const newPosts = posts.filter((p) => !urlPosts.includes(p.url));
-                  if (newPosts.length > 0) {
-                    const postsForAdd = newPosts.map((postElement) => {
-                      const id = _.uniqueId();
-                      const newPostElement = { ...postElement, id, feedsId: feedWithId.id };
-                      return newPostElement;
-                    });
-                    state.posts = [...initialState.posts, ...postsForAdd];
-                  }
-                })
-              }
-            });
+            .then((content) => content
+              .map((element) => parser(element.data.contents))
+              .forEach(([feed, posts]) => {
+                const [feedWithId] = initialState.feeds
+                  .filter((item) => item.link === feed.link);
+                const urlPosts = initialState.posts
+                  .filter((post) => post.feedsId === feedWithId.id)
+                  .map((el) => el.url);
+                const newPosts = posts.filter((p) => !urlPosts.includes(p.url));
+                if (newPosts.length > 0) {
+                  const postsForAdd = newPosts.map((postElement) => {
+                    const id = _.uniqueId();
+                    const newPostElement = { ...postElement, id, feedsId: feedWithId.id };
+                    return newPostElement;
+                  });
+                  state.posts = [...state.posts, ...postsForAdd];
+                }
+              }));
           intervalRender();
         }, 5000);
       };
@@ -129,9 +124,9 @@ const app = () => {
                     state.addedFeedProcess.error = i18n.t('rssInvalid');
                   } else {
                     const [feed, posts] = addIdentification(receivedData);
+                    feed.url = inputValue;
                     state.feeds.push(feed);
                     state.posts = [...state.posts, ...posts];
-                    state.feedsUrls.push(inputValue);
                     state.addedFeedProcess.status = 'filling';
                   }
                 })
