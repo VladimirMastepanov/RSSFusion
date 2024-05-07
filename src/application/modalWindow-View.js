@@ -1,5 +1,5 @@
-export default (state, coll) => {
-  const [post] = coll.filter((el) => el.url === state.currentModalWindow);
+export default (currentModalWindowId, coll) => {
+  const [post] = coll.filter((el) => el.id === currentModalWindowId);
   const title = document.querySelector('.modal-title');
   title.textContent = post.title;
   const body = document.querySelector('.modal-body');

@@ -3,7 +3,7 @@ export default {
     notEmpty: 'Не должно быть пустым',
     urlInvalid: 'Ссылка должна быть валидным URL',
     rssInvalid: 'Ресурс не содержит валидный RSS',
-    repeatedValueError: 'RSS уже существует',
+    urlTaken: 'RSS уже существует',
     rssUploaded: 'RSS успешно загружен',
     connectionError: 'Ошибка сети',
     posts: 'Посты',
