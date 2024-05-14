@@ -6,13 +6,10 @@ import * as yup from 'yup';
 import axios from 'axios';
 import resources from './locales/index.js';
 import view from './view.js';
-import parser from './parser.js';
-import addIdentification from './addIdentification.js';
-
-const urlBase = () => 'https://allorigins.hexlet.app/get?disableCache=true';
+import toParse from './toParse.js';
 
 const getUrl = (rssUrl) => {
-  const newUrl = new URL(urlBase());
+  const newUrl = new URL('https://allorigins.hexlet.app/get?disableCache=true');
   newUrl.searchParams.set('url', rssUrl);
   return newUrl;
 };
@@ -21,8 +18,8 @@ const initialState = {
   posts: [],
   feeds: [],
   addedFeedProcess: {
-    status: 'filling', // 'processing'
-    error: null,
+    status: 'filling', // 'processing' 'errorProcess'
+    errorMessage: null,
   },
   connectionError: null,
   uiState: {
@@ -61,7 +58,7 @@ const app = () => {
 
       const state = onChange(initialState, view(elements, initialState, i18n));
 
-      const baseSchema = yup.string().url().required();
+      const baseSchema = yup.string().url().required(i18n.t('notEmpty'));
 
       const validate = (fields) => {
         const actualSchema = baseSchema.notOneOf(state.feeds.map((i) => i.url), i18n.t('urlTaken'));
@@ -76,21 +73,21 @@ const app = () => {
           });
       };
 
-      const intervalRender = () => {
+      const postsUpdate = () => {
         setTimeout(() => {
           const promisesGet = state.feeds
             .map((feedItem) => feedItem.url)
             .map((link) => axios.get(getUrl(link)));
           Promise.all(promisesGet)
             .then((content) => content
-              .map((element) => parser(element.data.contents))
-              .forEach(([feed, posts]) => {
-                const [feedWithId] = initialState.feeds
-                  .filter((item) => item.link === feed.link);
-                const urlPosts = initialState.posts
+              .map((element) => toParse(element.data.contents))
+              .forEach(({ title, items }) => {
+                const [feedWithId] = state.feeds
+                  .filter((feed) => feed.title === title);
+                const urlPosts = state.posts
                   .filter((post) => post.feedsId === feedWithId.id)
                   .map((el) => el.url);
-                const newPosts = posts.filter((p) => !urlPosts.includes(p.url));
+                const newPosts = items.filter((i) => !urlPosts.includes(i.url));
                 if (newPosts.length > 0) {
                   const postsForAdd = newPosts.map((postElement) => {
                     const id = _.uniqueId();
@@ -99,35 +96,44 @@ const app = () => {
                   });
                   state.posts = [...state.posts, ...postsForAdd];
                 }
-              }));
-          intervalRender();
+              }))
+            .finally(() => postsUpdate());
         }, 5000);
       };
 
-      intervalRender();
+      postsUpdate();
 
       elements.form.addEventListener('submit', (e) => {
         e.preventDefault();
         const formData = new FormData(elements.form);
         const formValue = formData.get('url');
         const inputValue = formValue.trim();
+        state.addedFeedProcess.status = 'processing';
         validate(inputValue)
           .then((validationMessage) => {
             if (!_.isEmpty(validationMessage)) {
-              state.addedFeedProcess.error = validationMessage.message;
+              state.addedFeedProcess.errorMessage = validationMessage.message;
+              state.addedFeedProcess.status = 'errorProcess';
             } else {
-              state.addedFeedProcess.status = 'processing';
               axios.get(getUrl(inputValue))
                 .then((str) => {
-                  const receivedData = parser(str.data.contents);
-                  if (receivedData === null) {
-                    state.addedFeedProcess.error = i18n.t('rssInvalid');
-                  } else {
-                    const [feed, posts] = addIdentification(receivedData);
-                    feed.url = inputValue;
-                    state.feeds.push(feed);
-                    state.posts = [...state.posts, ...posts];
+                  try {
+                    const receivedData = toParse(str.data.contents);
+                    const { title, description, items } = receivedData;
+                    const feedsId = _.uniqueId();
+                    const feed = {
+                      title, description, url: inputValue, id: feedsId,
+                    };
+                    const posts = items.map((item) => {
+                      const itemId = _.uniqueId();
+                      return { ...item, feedsId, id: itemId };
+                    });
                     state.addedFeedProcess.status = 'filling';
+                    state.feeds = [...state.feeds, feed];
+                    state.posts = [...state.posts, ...posts];
+                  } catch (parserError) {
+                    state.addedFeedProcess.errorMessage = i18n.t(parserError.message);
+                    state.addedFeedProcess.status = 'errorProcess';
                   }
                 })
                 .catch((err) => {
@@ -144,7 +150,7 @@ const app = () => {
         const button = ev.target;
         if (button.tagName === 'BUTTON') {
           const targetId = button.attributes[1].value;
-          state.uiState.touchedPostsId.push(targetId);
+          state.uiState.touchedPostsId = [...state.uiState.touchedPostsId, targetId];
           state.uiState.currentModalWindowId = targetId;
         }
       });
