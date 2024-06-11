@@ -37,7 +37,7 @@ export default (elements, state, i18n) => (path, curValue) => {
         elements.submitButton.disabled = false;
         elements.input.classList.add(invalidInput);
         elements.pAlert.classList.replace('text-success', 'text-danger');
-        elements.pAlert.textContent = state.addedFeedProcess.errorMessage;
+        elements.pAlert.textContent = i18n.t(state.addedFeedProcess.errorMessage);
       }
       break;
     case 'uiState.currentModalWindowId':
@@ -46,7 +46,7 @@ export default (elements, state, i18n) => (path, curValue) => {
     case 'connectionError':
       elements.input.classList.add(invalidInput);
       elements.pAlert.classList.replace('text-success', 'text-danger');
-      elements.pAlert.textContent = state.connectionError;
+      elements.pAlert.textContent = i18n.t(state.connectionError);
       elements.input.disabled = false;
       elements.submitButton.disabled = false;
       elements.form.reset();

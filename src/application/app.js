@@ -32,7 +32,7 @@ const app = () => {
   const i18n = i18next.createInstance();
   i18n
     .init({
-      lng: 'ru',
+      lng: 'en',
       debug: true,
       resources,
     })
@@ -132,13 +132,13 @@ const app = () => {
                     state.feeds = [...state.feeds, feed];
                     state.posts = [...state.posts, ...posts];
                   } catch (parserError) {
-                    state.addedFeedProcess.errorMessage = i18n.t(parserError.message);
+                    state.addedFeedProcess.errorMessage = parserError.message;
                     state.addedFeedProcess.status = 'errorProcess';
                   }
                 })
                 .catch((err) => {
                   if (err.message === 'Network Error') {
-                    state.connectionError = i18n.t('connectionError');
+                    state.connectionError = 'connectionError';
                   }
                 });
             }
