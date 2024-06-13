@@ -1,5 +1,4 @@
-### Hexlet tests and linter status:
-[![Actions Status](https://github.com/VladimirMastepanov/frontend-project-11/actions/workflows/hexlet-check.yml/badge.svg)](https://github.com/VladimirMastepanov/frontend-project-11/actions)[![Maintainability](https://api.codeclimate.com/v1/badges/8c954f54421857af5f76/maintainability)](https://codeclimate.com/github/VladimirMastepanov/frontend-project-11/maintainability) <br> [Try it now!](https://frontend-project-11-iota-neon.vercel.app/ "Follow the link to try it")
+[![Maintainability](https://api.codeclimate.com/v1/badges/8c954f54421857af5f76/maintainability)](https://codeclimate.com/github/VladimirMastepanov/frontend-project-11/maintainability) <br> [Try it now!](https://frontend-project-11-iota-neon.vercel.app/ "Follow the link to try it")
 ___
 # [RSS Aggregator](https://frontend-project-11-iota-neon.vercel.app/ "Follow the link to try it")
 <img width="1232" alt="Снимок экрана 2024-04-14 в 19 27 30" src="https://github.com/VladimirMastepanov/frontend-project-11/assets/146621116/574185f0-54d8-4da4-9ab9-b52e2c1f272e">
