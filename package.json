@@ -10,14 +10,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+ssh://git@github.com/VladimirMastepanov/frontend-project-11.git"
+    "url": "git+ssh://git@github.com/VladimirMastepanov/RSSFusion.git"
   },
   "author": "Vladimir Mastepanov",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/VladimirMastepanov/frontend-project-11/issues"
+    "url": "https://github.com/VladimirMastepanov/RSSFusion/issues"
   },
-  "homepage": "https://github.com/VladimirMastepanov/frontend-project-11#readme",
+  "homepage": "https://github.com/VladimirMastepanov/RSSFusion#readme",
   "dependencies": {
     "axios": "^1.6.8",
     "bootstrap": "^5.3.3",
