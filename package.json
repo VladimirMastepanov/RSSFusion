@@ -1,7 +1,7 @@
 {
-  "name": "@hexlet/code",
+  "name": "RSSFusion",
   "version": "1.0.0",
-  "description": "RSS aggregator",
+  "description": "A browser-based RSS feed aggregator that collects and organizes news from multiple RSS sources in one place.",
   "type": "module",
   "main": "src/index.js",
   "scripts": {
