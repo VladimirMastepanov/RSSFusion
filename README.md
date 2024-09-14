@@ -7,7 +7,6 @@ ___
 **RSSFusion** is a browser-based RSS feed aggregator designed to collect and organize news from multiple RSS sources in one place. The application allows users to manage an unlimited number of RSS feeds, which are periodically updated to pull in new posts.
 
 This project was intentionally built without using **async/await** to deepen the developer's understanding of JavaScript's asynchronous behavior. It demonstrates the use of callbacks and promises for handling asynchronous requests, making it a valuable example of effective asynchronous programming.
-<img width="997" alt="Снимок экрана 2024-09-14 в 13 19 39" src="https://github.com/user-attachments/assets/8be15b56-4043-4956-a08e-416c28c40998">
 
 ---
 #### Why This Project?
